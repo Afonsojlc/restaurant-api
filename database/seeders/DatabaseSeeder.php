@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace Database\Seeders;
 
@@ -13,9 +13,9 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Criar Utilizadores
+        // 1. Seed Users (Restaurant Owner Admin & Customer)
         $admin = User::create([
-            'name' => 'Proprietario',
+            'name' => 'Restaurant Owner',
             'email' => 'admin@restaurante.pt',
             'password' => Hash::make('password123'),
             'role' => 'admin',
@@ -30,30 +30,30 @@ class DatabaseSeeder extends Seeder
             'phone' => '961234567',
         ]);
 
-        // 2. Criar Categorias
-        $entradas = Category::create(['name' => 'Entradas', 'description' => 'Para comecar bem']);
-        $principais = Category::create(['name' => 'Pratos Principais', 'description' => 'O melhor do chef']);
-        $sobremesas = Category::create(['name' => 'Sobremesas', 'description' => 'Doce final']);
+        // 2. Seed Menu Categories
+        $entradas = Category::create(['name' => 'Starters', 'description' => 'To start your dining experience']);
+        $principais = Category::create(['name' => 'Main Courses', 'description' => 'Chef specials and signature dishes']);
+        $sobremesas = Category::create(['name' => 'Desserts', 'description' => 'Sweet delicacies']);
 
-        // 3. Criar Pratos associados às categorias
+        // 3. Seed Menu Dishes linked to Categories
         $caldo = $entradas->dishes()->create(['name' => 'Caldo Verde', 'price' => 5.50, 'allergens' => 'lactose']);
-        $rissois = $entradas->dishes()->create(['name' => 'Rissois de Camarao', 'price' => 7.00, 'allergens' => 'gluten, marisco']);
-        
-        $bacalhau = $principais->dishes()->create(['name' => 'Bacalhau a Bras', 'price' => 18.50, 'allergens' => 'ovos, gluten']);
-        $bife = $principais->dishes()->create(['name' => 'Bife na Pedra', 'price' => 22.00, 'allergens' => '']);
-        
-        $mousse = $sobremesas->dishes()->create(['name' => 'Mousse de Chocolate', 'price' => 4.50, 'allergens' => 'ovos, lactose']);
+        $rissois = $entradas->dishes()->create(['name' => 'Shrimp Patties (Rissóis)', 'price' => 7.00, 'allergens' => 'gluten, shellfish']);
 
-        // 4. Criar uma Reserva de exemplo para a Maria
+        $bacalhau = $principais->dishes()->create(['name' => 'Bacalhau à Brás', 'price' => 18.50, 'allergens' => 'eggs, gluten']);
+        $bife = $principais->dishes()->create(['name' => 'Stone Steak', 'price' => 22.00, 'allergens' => '']);
+
+        $mousse = $sobremesas->dishes()->create(['name' => 'Chocolate Mousse', 'price' => 4.50, 'allergens' => 'eggs, lactose']);
+
+        // 4. Seed an initial table reservation for Maria
         $reserva = Reservation::create([
             'user_id' => $cliente->id,
             'reserved_at' => now()->addDays(3),
             'guests' => 2,
-            'notes' => 'Mesa perto da janela, se possivel.',
+            'notes' => 'Table by the window if available, please.',
             'status' => 'pending',
         ]);
 
-        // 5. Associar pratos à reserva (2 caldos e 2 bacalhaus) usando a tabela intermédia (pivot)
+        // 5. Attach dishes with quantities using Many-to-Many pivot table (reservation_dish)
         $reserva->dishes()->attach([
             $caldo->id => ['quantity' => 2],
             $bacalhau->id => ['quantity' => 2]

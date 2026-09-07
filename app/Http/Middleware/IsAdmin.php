@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace App\Http\Middleware;
 
@@ -8,14 +8,16 @@ use Symfony\Component\HttpFoundation\Response;
 
 class IsAdmin
 {
+    /**
+     * Handle incoming request and verify administrator / restaurant owner role.
+     */
     public function handle(Request $request, Closure $next): Response
     {
-        // Se o utilizador NÃO for admin, barra a entrada com um erro 403
+        // Deny access with 403 Forbidden if user is not an administrator
         if (!$request->user()?->isAdmin()) {
-            return response()->json(['message' => 'Acesso reservado ao proprietario.'], 403);
+            return response()->json(['message' => 'Access forbidden: Administrator privileges required.'], 403);
         }
 
-        // Se for admin, deixa passar para o passo seguinte
         return $next($request);
     }
 }

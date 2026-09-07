@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace App\Http\Controllers;
 
@@ -9,7 +9,7 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    // POST /api/register
+    // POST /api/register — Register customer account & generate initial Sanctum token
     public function register(Request $request)
     {
         $request->validate([
@@ -24,19 +24,19 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'phone' => $request->phone,
-            'role' => 'client', // Registo sempre cria cliente
+            'role' => 'client', // Default role is always client
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'message' => 'Conta criada.', 
-            'token' => $token, 
+            'message' => 'Account created successfully.',
+            'token' => $token,
             'user' => $user
         ], 201);
     }
 
-    // POST /api/login
+    // POST /api/login — Authenticate credentials and issue Sanctum token
     public function login(Request $request)
     {
         $request->validate([
@@ -47,34 +47,35 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages(['email' => ['Credenciais invalidas.']]);
+            throw ValidationException::withMessages(['email' => ['Invalid credentials provided.']]);
         }
 
-        $user->tokens()->delete(); // Invalida sessoes anteriores
+        // Invalidate prior access tokens to enforce clean single-session login
+        $user->tokens()->delete();
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'message' => 'Login efectuado.', 
-            'token' => $token, 
+            'message' => 'Logged in successfully.',
+            'token' => $token,
             'user' => $user
         ]);
     }
 
-    // POST /api/logout
+    // POST /api/logout — Revoke current Sanctum token
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
-        return response()->json(['message' => 'Sessao terminada.']);
+        return response()->json(['message' => 'Logged out successfully. Token revoked.']);
     }
 
-    // GET /api/me
+    // GET /api/me — Retrieve authenticated user profile
     public function me(Request $request)
     {
         return response()->json($request->user());
     }
 
-    // PUT /api/me - o cliente edita o seu proprio perfil
+    // PUT /api/me — Update user profile details
     public function updateMe(Request $request)
     {
         $user = $request->user();
@@ -92,6 +93,6 @@ class AuthController extends Controller
 
         $user->update($data);
 
-        return response()->json(['message' => 'Perfil actualizado.', 'user' => $user]);
+        return response()->json(['message' => 'Profile updated successfully.', 'user' => $user]);
     }
 }

@@ -1,7 +1,7 @@
-{
+﻿{
   "info": {
     "_postman_id": "121f9502-0676-4926-b629-0ab73c9a0a10",
-    "name": "Restaurante API",
+    "name": "Restaurant API",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "52625259"
   },
@@ -121,7 +121,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Afonso José Lopes Carvalho\",\n    \"phone\": \"919900000\"\n}",
+              "raw": "{\n    \"name\": \"Afonso JosÃ© Lopes Carvalho\",\n    \"phone\": \"919900000\"\n}",
               "options": {
                 "raw": {
                   "language": "json"

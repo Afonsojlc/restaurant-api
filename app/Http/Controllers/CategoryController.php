@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace App\Http\Controllers;
 
@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    // GET /api/categories (PÚBLICO)
+    // GET /api/categories (PUBLIC — Returns active categories with dish counts)
     public function index()
     {
         return response()->json(
@@ -15,7 +15,7 @@ class CategoryController extends Controller
         );
     }
 
-    // GET /api/categories/{id} (PÚBLICO - inclui pratos disponíveis)
+    // GET /api/categories/{id} (PUBLIC — Includes currently available dishes)
     public function show(Category $category)
     {
         return response()->json(
@@ -23,7 +23,7 @@ class CategoryController extends Controller
         );
     }
 
-    // POST /api/categories - ADMIN
+    // POST /api/categories (ADMIN ONLY)
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -35,7 +35,7 @@ class CategoryController extends Controller
         return response()->json(Category::create($data), 201);
     }
 
-    // PUT /api/categories/{id} - ADMIN
+    // PUT /api/categories/{id} (ADMIN ONLY)
     public function update(Request $request, Category $category)
     {
         $data = $request->validate([
@@ -48,10 +48,10 @@ class CategoryController extends Controller
         return response()->json($category);
     }
 
-    // DELETE /api/categories/{id} - ADMIN
+    // DELETE /api/categories/{id} (ADMIN ONLY)
     public function destroy(Category $category)
     {
         $category->delete();
-        return response()->json(['message' => 'Categoria removida.']);
+        return response()->json(['message' => 'Category removed successfully.']);
     }
 }

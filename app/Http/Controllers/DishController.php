@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace App\Http\Controllers;
 
@@ -7,37 +7,37 @@ use Illuminate\Http\Request;
 
 class DishController extends Controller
 {
-    // GET /api/dishes?category_id=1&available=true&max_price=15 (PÚBLICO)
+    // GET /api/dishes?category_id=1&available=true&max_price=15 (PUBLIC)
     public function index(Request $request)
     {
-        $q = Dish::with('category'); // Carrega a categoria do prato para sabermos a que secção pertence
+        $q = Dish::with('category');
 
-        // Filtro por Categoria
+        // Filter by Category
         if ($request->has('category_id')) {
             $q->where('category_id', $request->category_id);
         }
 
-        // Filtro por Disponibilidade
+        // Filter by Availability
         if ($request->has('available')) {
             $q->where('available', $request->boolean('available'));
         }
 
-        // Filtro por Preço Máximo
+        // Filter by Maximum Price
         if ($request->has('max_price')) {
             $q->where('price', '<=', $request->max_price);
         }
 
-        // Retorna com paginação (12 pratos por página)
+        // Paginated results (12 dishes per page)
         return response()->json($q->paginate(12));
     }
 
-    // GET /api/dishes/{id} (PÚBLICO)
+    // GET /api/dishes/{id} (PUBLIC)
     public function show(Dish $dish)
     {
         return response()->json($dish->load('category'));
     }
 
-    // POST /api/dishes - ADMIN
+    // POST /api/dishes (ADMIN ONLY)
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -50,11 +50,11 @@ class DishController extends Controller
         ]);
 
         $dish = Dish::create($data);
-        
+
         return response()->json($dish->load('category'), 201);
     }
 
-    // PUT /api/dishes/{id} - ADMIN
+    // PUT /api/dishes/{id} (ADMIN ONLY)
     public function update(Request $request, Dish $dish)
     {
         $data = $request->validate([
@@ -67,15 +67,15 @@ class DishController extends Controller
         ]);
 
         $dish->update($data);
-        
+
         return response()->json($dish->load('category'));
     }
 
-    // DELETE /api/dishes/{id} - ADMIN
+    // DELETE /api/dishes/{id} (ADMIN ONLY)
     public function destroy(Dish $dish)
     {
         $dish->delete();
-        
-        return response()->json(['message' => 'Prato removido.']);
+
+        return response()->json(['message' => 'Dish removed successfully.']);
     }
 }

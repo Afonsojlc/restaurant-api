@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace App\Http\Controllers;
 
@@ -7,16 +7,18 @@ use Illuminate\Http\Request;
 
 class ReservationController extends Controller
 {
-    // GET /api/reservations (Admin vê todas, Cliente vê apenas as suas)
+    // GET /api/reservations (Admins see all reservations; Customers see only their own)
     public function index(Request $request)
     {
         $user = $request->user();
         $query = Reservation::with(['user', 'dishes']);
 
+        // Scope to current customer if not an administrator
         if (!$user->isAdmin()) {
             $query->where('user_id', $user->id);
         }
 
+        // Optional filter by reservation status (pending, confirmed, cancelled)
         if ($request->has('status')) {
             $query->where('status', $request->status);
         }
@@ -24,14 +26,14 @@ class ReservationController extends Controller
         return response()->json($query->orderBy('reserved_at')->paginate(10));
     }
 
-    // GET /api/reservations/{id}
+    // GET /api/reservations/{id} — Retrieve reservation details
     public function show(Request $request, Reservation $reservation)
     {
         $this->checkAccess($request->user(), $reservation);
         return response()->json($reservation->load(['user', 'dishes']));
     }
 
-    // POST /api/reservations - Cliente cria reserva
+    // POST /api/reservations — Customer creates a new table reservation
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -51,7 +53,7 @@ class ReservationController extends Controller
             'status' => 'pending',
         ]);
 
-        // Associa pratos com quantidade (tabela pivot)
+        // Attach pre-ordered dishes with quantities via pivot table (reservation_dish)
         if (!empty($data['dishes'])) {
             $pivot = collect($data['dishes'])->mapWithKeys(fn($d) => [
                 $d['id'] => ['quantity' => $d['quantity'] ?? 1]
@@ -62,13 +64,13 @@ class ReservationController extends Controller
         return response()->json($reservation->load(['user', 'dishes']), 201);
     }
 
-    // PUT /api/reservations/{id} - Cliente edita (só se pending)
+    // PUT /api/reservations/{id} — Customer modifies reservation (Only allowed if 'pending')
     public function update(Request $request, Reservation $reservation)
     {
         $this->checkAccess($request->user(), $reservation);
 
         if ($reservation->status !== 'pending') {
-            return response()->json(['message' => 'So e possivel editar reservas pendentes.'], 422);
+            return response()->json(['message' => 'Only pending reservations can be edited.'], 422);
         }
 
         $data = $request->validate([
@@ -92,21 +94,21 @@ class ReservationController extends Controller
         return response()->json($reservation->load(['user', 'dishes']));
     }
 
-    // PATCH /api/reservations/{id}/cancel - Cliente cancela a sua reserva
+    // PATCH /api/reservations/{id}/cancel — Customer cancels their reservation
     public function cancel(Request $request, Reservation $reservation)
     {
         $this->checkAccess($request->user(), $reservation);
 
         if ($reservation->status === 'cancelled') {
-            return response()->json(['message' => 'Reserva ja cancelada.'], 422);
+            return response()->json(['message' => 'Reservation is already cancelled.'], 422);
         }
 
         $reservation->update(['status' => 'cancelled']);
-        
-        return response()->json(['message' => 'Reserva cancelada.', 'reservation' => $reservation]);
+
+        return response()->json(['message' => 'Reservation cancelled successfully.', 'reservation' => $reservation]);
     }
 
-    // PATCH /api/reservations/{id}/status - Admin altera estado
+    // PATCH /api/reservations/{id}/status — Restaurant Admin confirms or rejects reservation
     public function updateStatus(Request $request, Reservation $reservation)
     {
         $request->validate([
@@ -116,23 +118,23 @@ class ReservationController extends Controller
         $reservation->update(['status' => $request->status]);
 
         return response()->json([
-            'message' => 'Estado actualizado.',
+            'message' => 'Reservation status updated successfully.',
             'reservation' => $reservation->load(['user', 'dishes']),
         ]);
     }
 
-    // DELETE /api/reservations/{id} - Admin apaga
+    // DELETE /api/reservations/{id} — Admin removes reservation record
     public function destroy(Reservation $reservation)
     {
         $reservation->delete();
-        return response()->json(['message' => 'Reserva eliminada.']);
+        return response()->json(['message' => 'Reservation removed successfully.']);
     }
 
-    // Método privado: verifica se o utilizador pode aceder a esta reserva
+    // Guard helper: Enforce that users can only access their own reservations unless they are Admin
     private function checkAccess($user, Reservation $reservation): void
     {
         if (!$user->isAdmin() && $reservation->user_id !== $user->id) {
-            abort(403, 'Nao tens permissao para aceder a esta reserva.');
+            abort(403, 'Unauthorized: You do not have permission to access this reservation.');
         }
     }
 }
