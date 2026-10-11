@@ -5,12 +5,11 @@
   <img src="https://img.shields.io/badge/PHP-8.3%2B-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP 8.3+" />
   <img src="https://img.shields.io/badge/Sanctum-Auth-F05340?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel Sanctum" />
   <img src="https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite" />
+  <img src="https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white" alt="Postman" />
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="MIT License" />
 </p>
 
-A RESTful restaurant menu and table reservation API built with **Laravel 11**, **Eloquent ORM**, and **Laravel Sanctum**.
-
-It manages menu categories, dish items, customer table reservations with dish pre-ordering, and role-based permissions (Customer and Restaurant Admin).
+> A RESTful restaurant menu and table reservation API built with **Laravel 11**, **Eloquent ORM**, and **Laravel Sanctum**. It manages menu categories, dish items, customer table reservations with dish pre-ordering, and role-based permissions (Customer and Restaurant Admin).
 
 ---
 
